@@ -2,16 +2,21 @@ import React, { useState, useEffect } from "react";
 
 function App() {
   const [dogs, setDogs] = useState([]);
+  const [filterGoodDogs, setFilterGoodDogs] = useState(false);
   const [selectedDog, setSelectedDog] = useState(null);
 
   useEffect(() => {
-    fetch("/db.json")
+    fetchDogs();
+  }, [])
+
+  const fetchDogs = () => {
+    fetch(" http://localhost:3001/pups")
       .then((response) => response.json())
       .then((data) => {
-        setDogs(data.pups);
+        setDogs(data);
       })
       .catch((error) => console.error("Error fetching dogs:", error));
-  }, []);
+  }
 
   const handleDogClick = (dog) => {
     setSelectedDog(dog);
@@ -41,10 +46,21 @@ function App() {
     }
   };
 
+  const filteredDogs = filterGoodDogs ? dogs.filter((dog) => dog.isGoodDog) : dogs;
+
+  const toggleGoodDogFilter = () => {
+    setFilterGoodDogs((prevFilterGoodDogs) => !prevFilterGoodDogs);
+  };
+
   return (
     <div className="App">
+      <div id="filter-div">
+        <button id="good-dog-filter" onClick={toggleGoodDogFilter}>
+          {filterGoodDogs ? "Filter good dogs: ON" : "Filter good dogs: OFF"}
+        </button>
+      </div>
       <div id="dog-bar">
-        {dogs.map((dog) => (
+        {filteredDogs.map((dog) => (
           <span
             key={dog.id}
             onClick={() => handleDogClick(dog)}
